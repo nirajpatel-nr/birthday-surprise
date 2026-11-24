@@ -1,0 +1,650 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Surprise 🎂</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #493080, #100b26 75%);
+    color: white;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+.screen {
+    min-height: 100vh;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.screen.active {
+    display: flex;
+    animation: appear 0.8s ease;
+}
+
+@keyframes appear {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    font-size: clamp(30px, 6vw, 55px);
+    color: #ffcaef;
+    text-shadow: 0 0 20px #ff40c8;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 18px;
+    line-height: 1.7;
+    max-width: 550px;
+    margin-bottom: 25px;
+}
+
+button {
+    padding: 14px 30px;
+    margin: 8px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(45deg, #ff36a5, #9b5cff);
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 20px #ff36a566;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.08);
+}
+
+.small {
+    font-size: 14px;
+    color: #d7c9ed;
+}
+
+/* Birthday cake */
+
+.cake-scene {
+    height: 310px;
+    width: 320px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    perspective: 700px;
+    margin: 20px auto;
+}
+
+.cake {
+    position: relative;
+    width: 240px;
+    height: 150px;
+    transform-style: preserve-3d;
+    transition: 1s;
+}
+
+.plate {
+    position: absolute;
+    bottom: -12px;
+    left: -20px;
+    width: 280px;
+    height: 25px;
+    border-radius: 50%;
+    background: linear-gradient(#fff, #b8b4d5);
+    box-shadow: 0 8px 20px #0008;
+}
+
+.cake-body {
+    position: absolute;
+    bottom: 0;
+    width: 240px;
+    height: 115px;
+    background: linear-gradient(90deg, #b84cbd, #f49add, #b84cbd);
+    border-radius: 10px 10px 20px 20px;
+    box-shadow: inset 0 -15px 0 #a83d9e;
+    overflow: visible;
+}
+
+.cake-top {
+    position: absolute;
+    top: -15px;
+    width: 240px;
+    height: 40px;
+    background: linear-gradient(135deg, #ffe3f5, #ff9bdc);
+    border-radius: 50%;
+    border-bottom: 5px solid #ff69b4;
+}
+
+.cake-body::after {
+    content: "🍓  ✨  🍓";
+    position: absolute;
+    top: 45px;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+}
+
+.candle {
+    position: absolute;
+    bottom: 120px;
+    width: 10px;
+    height: 48px;
+    background: repeating-linear-gradient(
+        45deg, white 0 5px, #ff4b9a 5px 10px
+    );
+    border-radius: 3px;
+    z-index: 5;
+}
+
+.candle:nth-child(1) { left: 65px; }
+.candle:nth-child(2) { left: 115px; }
+.candle:nth-child(3) { left: 165px; }
+
+.flame {
+    position: absolute;
+    top: -23px;
+    left: 0;
+    width: 10px;
+    height: 20px;
+    border-radius: 50% 50% 50% 50%;
+    background: #ffb52e;
+    box-shadow: 0 0 15px #ffae00, 0 0 25px #ff4b00;
+    animation: flicker 0.3s infinite alternate;
+}
+
+@keyframes flicker {
+    from { transform: scale(1) rotate(-5deg); }
+    to { transform: scale(1.2) rotate(5deg); }
+}
+
+.flame.out {
+    display: none;
+}
+
+.smoke {
+    position: absolute;
+    top: -35px;
+    left: -4px;
+    font-size: 20px;
+    opacity: 0;
+}
+
+.smoke.show {
+    animation: smoke 1.5s forwards;
+}
+
+@keyframes smoke {
+    0% { opacity: 0; transform: translateY(0); }
+    50% { opacity: 0.8; }
+    100% { opacity: 0; transform: translateY(-35px); }
+}
+
+/* Cake cutting */
+
+.cake-body.cut .cake-half.left {
+    transform: translateX(-55px) rotate(-8deg);
+}
+
+.cake-body.cut .cake-half.right {
+    transform: translateX(55px) rotate(8deg);
+}
+
+.cake-half {
+    position: absolute;
+    top: 0;
+    height: 115px;
+    width: 50%;
+    transition: 1.5s;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.cake-half.left { left: 0; }
+.cake-half.right { right: 0; }
+
+.knife {
+    font-size: 55px;
+    position: absolute;
+    top: 20px;
+    right: 0;
+    opacity: 0;
+    transform: rotate(-45deg);
+    z-index: 10;
+}
+
+.knife.cut {
+    animation: knifeCut 1.5s forwards;
+}
+
+@keyframes knifeCut {
+    0% { opacity: 1; transform: translate(50px,-50px) rotate(-45deg); }
+    60% { transform: translate(-80px,100px) rotate(-45deg); }
+    100% { opacity: 0; transform: translate(-120px,150px) rotate(-45deg); }
+}
+
+/* Confetti */
+
+.confetti {
+    position: fixed;
+    top: -20px;
+    width: 10px;
+    height: 15px;
+    animation: fall 3s linear forwards;
+    z-index: 100;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SCREEN 1 -->
+
+<section class="screen active" id="welcome">
+
+    <h1>🎉 A Special Surprise 🎉</h1>
+
+    <p>
+        Someone special has a surprise waiting for you...
+        Are you ready?
+    </p>
+
+    <div style="font-size:90px; animation: flicker 2s infinite;">
+        🎁
+    </div>
+
+    <button onclick="showScreen('wish')">
+        Open Your Surprise ❤️
+    </button>
+
+</section>
+
+
+<!-- SCREEN 2 -->
+
+<section class="screen" id="wish">
+
+    <div style="font-size:75px;">🎂</div>
+
+    <h1>Happy Birthday Dost! ❤️</h1>
+
+    <p>
+        Dear Dost,<br>
+        Wishing you a very Happy Birthday! 🥳
+
+        May your life always be filled with
+        happiness, love, laughter and success.
+
+        Keep smiling and keep shining!
+
+        Today is your special day.
+        Enjoy every moment! 💖
+    </p>
+
+    <h2 style="color:#ffb5e6;">
+        Lots of Love! 💕
+    </h2>
+
+    <button onclick="showScreen('cake')">
+        Let's Celebrate 🎂
+    </button>
+
+</section>
+
+
+<!-- SCREEN 3 -->
+
+<section class="screen" id="cake">
+
+    <h1>Make a Wish! ✨</h1>
+
+    <p>
+        Here is a special birthday cake for you!
+        Take a deep breath and blow the candles! 🕯️
+    </p>
+
+    <div class="cake-scene">
+
+        <div class="cake">
+
+            <div class="plate"></div>
+
+            <div class="cake-body" id="cakeBody">
+
+                <div class="cake-top"></div>
+
+                <div class="cake-half left"></div>
+                <div class="cake-half right"></div>
+
+                <div class="candle">
+                    <div class="flame"></div>
+                    <div class="smoke">〰</div>
+                </div>
+
+                <div class="candle">
+                    <div class="flame"></div>
+                    <div class="smoke">〰</div>
+                </div>
+
+                <div class="candle">
+                    <div class="flame"></div>
+                    <div class="smoke">〰</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="knife" id="knife">🔪</div>
+
+    </div>
+
+    <h3 id="message">🕯️ Candles are waiting!</h3>
+
+    <button id="micButton" onclick="startMic()">
+        🎤 Blow Candles
+    </button>
+
+    <button id="manualButton" onclick="blowCandles()">
+        Blow Candles (Manual)
+    </button>
+
+    <p class="small" id="micStatus">
+        Allow microphone access to blow the candles.
+    </p>
+
+</section>
+
+
+<!-- SCREEN 4 -->
+
+<section class="screen" id="cut">
+
+    <h1>Time to Cut the Cake! 🎂</h1>
+
+    <p>
+        Your birthday wish is ready!
+        Let's cut this beautiful cake together!
+    </p>
+
+    <div style="font-size:100px; animation: appear 2s;">
+        🍰
+    </div>
+
+    <button onclick="cutCake()">
+        🔪 Cut the Cake
+    </button>
+
+    <div id="cutMessage"></div>
+
+</section>
+
+
+<!-- SCREEN 5 -->
+
+<section class="screen" id="final">
+
+    <div style="font-size:100px;">🎉🎊🎈</div>
+
+    <h1>Happy Birthday Dost! ❤️</h1>
+
+    <p>
+        May all your dreams come true!
+
+        Keep laughing, keep shining,
+        and have an amazing year ahead.
+
+        You deserve all the happiness
+        in the world! 💖
+    </p>
+
+    <h2 style="color:#ffb5e6;">
+        Enjoy Your Special Day! 🥳
+    </h2>
+
+    <button onclick="location.reload()">
+        Replay Surprise 🔄
+    </button>
+
+</section>
+
+
+<script>
+
+function showScreen(id) {
+
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+
+    document.getElementById(id).classList.add('active');
+
+    if(id === 'cake') {
+        setTimeout(() => {
+            document.getElementById('message').innerText =
+                "Make a wish and blow! 🕯️";
+        }, 500);
+    }
+
+}
+
+
+// MICROPHONE FEATURE
+
+let audioContext;
+let analyser;
+let microphone;
+let micActive = false;
+let blowTimer = null;
+let lastBlow = 0;
+
+async function startMic() {
+
+    try {
+
+        if(!navigator.mediaDevices ||
+           !navigator.mediaDevices.getUserMedia) {
+            throw new Error("Microphone not supported");
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+
+        audioContext = new (
+            window.AudioContext || window.webkitAudioContext
+        )();
+
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 1024;
+
+        microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+
+        micActive = true;
+
+        document.getElementById('micStatus').innerText =
+            "🎤 Microphone is ON! Blow towards your microphone!";
+
+        document.getElementById('micButton').innerText =
+            "🎤 Listening...";
+
+        detectBlow();
+
+    } catch(error) {
+
+        document.getElementById('micStatus').innerText =
+            "Microphone permission unavailable. Use the manual button.";
+
+    }
+
+}
+
+
+function detectBlow() {
+
+    if(!micActive) return;
+
+    const data = new Uint8Array(analyser.fftSize);
+
+    analyser.getByteTimeDomainData(data);
+
+    let sum = 0;
+
+    for(let i = 0; i < data.length; i++) {
+        const value = (data[i] - 128) / 128;
+        sum += value * value;
+    }
+
+    const volume = Math.sqrt(sum / data.length);
+
+    const now = Date.now();
+
+    // Sound threshold for detecting a blow
+    if(volume > 0.075 && now - lastBlow > 1200) {
+
+        lastBlow = now;
+
+        blowCandles();
+
+        return;
+    }
+
+    blowTimer = requestAnimationFrame(detectBlow);
+
+}
+
+
+// EXTINGUISH CANDLES
+
+function blowCandles() {
+
+    if(!document.getElementById('cake').classList.contains('active')) {
+        return;
+    }
+
+    const flames = document.querySelectorAll('.flame');
+
+    if(flames[0].classList.contains('out')) return;
+
+    flames.forEach(flame => {
+        flame.classList.add('out');
+    });
+
+    document.querySelectorAll('.smoke').forEach(smoke => {
+        smoke.classList.add('show');
+    });
+
+    micActive = false;
+
+    if(blowTimer) {
+        cancelAnimationFrame(blowTimer);
+    }
+
+    if(audioContext) {
+        audioContext.close();
+    }
+
+    document.getElementById('micStatus').innerText =
+        "Candles are blown out! 🎉";
+
+    document.getElementById('micButton').style.display = "none";
+    document.getElementById('manualButton').style.display = "none";
+
+    document.getElementById('message').innerText =
+        "Wish Made! ❤️";
+
+    setTimeout(() => {
+
+        showScreen('cut');
+
+    }, 2500);
+
+}
+
+
+// CAKE CUTTING ANIMATION
+
+function cutCake() {
+
+    const knife = document.getElementById('knife');
+
+    knife.classList.add('cut');
+
+    document.getElementById('cutMessage').innerHTML =
+        "<h2 style='color:#ffb5e6;margin-top:20px;'>Cake Cut Successfully! 🎂❤️</h2>";
+
+    setTimeout(() => {
+
+        celebrate();
+        showScreen('final');
+
+    }, 1800);
+
+}
+
+
+// CONFETTI CELEBRATION
+
+function celebrate() {
+
+    const colors = [
+        '#ff4ba6',
+        '#ffd700',
+        '#9b5cff',
+        '#00e5ff',
+        '#ffffff'
+    ];
+
+    for(let i = 0; i < 100; i++) {
+
+        const piece = document.createElement('div');
+
+        piece.className = 'confetti';
+
+        piece.style.left = Math.random() * 100 + 'vw';
+
+        piece.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+
+        piece.style.animationDuration =
+            (2 + Math.random() * 3) + 's';
+
+        piece.style.animationDelay =
+            Math.random() * 1.5 + 's';
+
+        document.body.appendChild(piece);
+
+        setTimeout(() => piece.remove(), 6000);
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
